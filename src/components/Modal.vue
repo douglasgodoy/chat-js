@@ -7,7 +7,7 @@
       <b-form-input
         v-model="nick"
         placeholder="Enter your name"
-        @keyup="cNick"
+        @blur="cNick"
       ></b-form-input>
       <div class="mt-2" v-if="nick">
         <span class="text-primary font-weight-bold">{{ nick }}</span>
@@ -30,18 +30,18 @@
 <script>
 export default {
   props: {
-    nickname: String
+    nickname: String,
   },
   data() {
     return {
       modalShow: true,
-      nick: ""
+      nick: "",
     };
   },
   methods: {
     cNick() {
       this.$emit("changed", this.nick);
-    }
-  }
+    },
+  },
 };
 </script>

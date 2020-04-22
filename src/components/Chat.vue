@@ -18,16 +18,20 @@
       </b-input-group-append>
     </b-input-group>
 
-    <Display :nickname="nickname"></Display>
+    <Display :messages="informations"></Display>
 
-    <div class="d-flex">
-      <b-form-textarea
-        id="textarea"
+    <div class="d-flex" v-if="nickname">
+      <b-form-input
+        id="input"
         size="lg"
+        v-model="message"
         placeholder="your message here..."
-        @keyup.enter="test"
+        @keyup.enter="sendMessage"
       />
-      <b-button class="sendMessage col-2 col-md-1 border-none">
+      <b-button
+        class="sendMessage col-2 col-md-1 border-none"
+        @click="sendMessage"
+      >
         <font-awesome-icon :icon="['fas', 'paper-plane']" size="lg" />
       </b-button>
     </div>
@@ -38,29 +42,50 @@
 <script>
 import Display from "./Display";
 import Modal from "./Modal";
+import socket from "socket.io-client";
+
 export default {
   components: {
     Display,
-    Modal
+    Modal,
   },
   data() {
     return {
-      nickname: ""
+      nickname: "",
+      informations: [],
+      message: "",
     };
-  },
-  computed: {
-    thereIsNickname() {
-      return this.nickname.length > 0;
-    }
   },
   methods: {
     changeNick(event) {
       this.nickname = event.target.value;
     },
-    test() {
-      console.log("a");
-    }
-  }
+    prepareMsg() {
+      return {
+        author: this.nickname,
+        message: this.message,
+      };
+    },
+    sendMessage() {
+      const io = socket.connect("http://localhost/chat");
+      io.on("send", (data) => {
+        this.informations = { ...this.informations, ...data };
+      });
+      io.emit("send", this.prepareMsg());
+      this.message = "";
+    },
+  },
+  mounted() {
+    const io = socket.connect("http://localhost/chat");
+    io.on("getData", (data) => {
+      this.informations.push(...data);
+    });
+  },
+  computed: {
+    thereIsNickname() {
+      return this.nickname.length > 0;
+    },
+  },
 };
 </script>
 
@@ -79,7 +104,7 @@ export default {
 *:focus {
   outline: none !important;
 }
-#textarea {
+#input {
   border-radius: 0.3rem 0 0 0.3rem !important;
   border: none !important;
 }

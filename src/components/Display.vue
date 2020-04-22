@@ -1,13 +1,13 @@
 <template>
   <div class="my-4 border rounded flex-grow-1" id="messages-display">
-    <div class="text-right">
-      <span class="nick">{{ nickname }}</span>
+    <div class="text-right" v-for="(message, i) in messages" :key="i">
+      <span class="nick">{{ message.author }}</span>
       <div class="message">
-        <span> hi, my name is {{ nickname }}</span>
+        <span>{{ message.message }}</span>
       </div>
     </div>
     <div>
-      <span class="nick">{{ nickname }}</span>
+      <span class="nick">teste</span>
       <div class="message"><span class="others"> and you ?</span></div>
     </div>
   </div>
@@ -16,8 +16,8 @@
 <script>
 export default {
   props: {
-    nickname: String
-  }
+    messages: [Array, Object],
+  },
 };
 </script>
 
