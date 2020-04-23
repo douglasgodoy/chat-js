@@ -1,14 +1,10 @@
 <template>
   <div class="my-4 border rounded flex-grow-1" id="messages-display">
-    <div class="text-right" v-for="(message, i) in messages" :key="i">
+    <div :class="{'text-right': message.isPerson}" v-for="(message, i) in messages" :key="i">
       <span class="nick">{{ message.author }}</span>
       <div class="message">
-        <span>{{ message.message }}</span>
+        <span :class="{others:!message.isPerson}">{{ message.message }}</span>
       </div>
-    </div>
-    <div>
-      <span class="nick">teste</span>
-      <div class="message"><span class="others"> and you ?</span></div>
     </div>
   </div>
 </template>
@@ -16,8 +12,8 @@
 <script>
 export default {
   props: {
-    messages: [Array, Object],
-  },
+    messages: [Array, Object]
+  }
 };
 </script>
 
@@ -42,6 +38,8 @@ export default {
 }
 #messages-display {
   padding: 0.5vw;
+  max-height: 70vh;
+  overflow: auto;
 }
 
 .nick {

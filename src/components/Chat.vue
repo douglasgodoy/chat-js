@@ -12,9 +12,7 @@
       />
 
       <b-input-group-append>
-        <b-button variant="info" @click="$bvModal.show('nicknameModal')"
-          >Change</b-button
-        >
+        <b-button variant="info" @click="$bvModal.show('nicknameModal')">Change</b-button>
       </b-input-group-append>
     </b-input-group>
 
@@ -28,10 +26,7 @@
         placeholder="your message here..."
         @keyup.enter="sendMessage"
       />
-      <b-button
-        class="sendMessage col-2 col-md-1 border-none"
-        @click="sendMessage"
-      >
+      <b-button class="sendMessage col-2 col-md-1 border-none" @click="sendMessage">
         <font-awesome-icon :icon="['fas', 'paper-plane']" size="lg" />
       </b-button>
     </div>
@@ -42,18 +37,19 @@
 <script>
 import Display from "./Display";
 import Modal from "./Modal";
-import socket from "socket.io-client";
+import io from "socket.io-client";
 
 export default {
   components: {
     Display,
-    Modal,
+    Modal
   },
   data() {
     return {
       nickname: "",
       informations: [],
       message: "",
+      id: ""
     };
   },
   methods: {
@@ -64,28 +60,33 @@ export default {
       return {
         author: this.nickname,
         message: this.message,
+        id: this.id
       };
     },
     sendMessage() {
-      const io = socket.connect("http://localhost/chat");
-      io.on("send", (data) => {
-        this.informations = { ...this.informations, ...data };
-      });
-      io.emit("send", this.prepareMsg());
+      const socket = io.connect("http://localhost/chat");
+      socket.emit("send", this.prepareMsg());
       this.message = "";
-    },
+    }
   },
   mounted() {
-    const io = socket.connect("http://localhost/chat");
-    io.on("getData", (data) => {
-      this.informations.push(...data);
+    const socket = io("http://localhost/chat");
+
+    socket.on("getData", data => {
+      this.id = data;
+      console.log(this.id);
     });
+
+    socket.on(
+      "send",
+      data => (this.informations = { ...this.informations, ...data })
+    );
   },
   computed: {
     thereIsNickname() {
       return this.nickname.length > 0;
-    },
-  },
+    }
+  }
 };
 </script>
 
